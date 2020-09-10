@@ -5,12 +5,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import posts.erikgronlund.com.R
 import posts.erikgronlund.com.data.Photo
 import posts.erikgronlund.com.data.Post
 import posts.erikgronlund.com.data.PostsAndPhotos
+import kotlin.random.Random
 
-class PostsListAdapter(private val postsList: PostsAndPhotos): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>() {
+class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>() {
+    private var postsList: PostsAndPhotos? = null
+
+    fun setPostsAndPhotos(posts: PostsAndPhotos) {
+        postsList = posts
+        notifyDataSetChanged()
+    }
 
     override fun getItemCount(): Int {
       val postsData = postsList?.posts?.data
@@ -27,8 +36,9 @@ class PostsListAdapter(private val postsList: PostsAndPhotos): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = postsList.posts.data!![position]
-        val photo = postsList.photos.data!![position]
+        val post = postsList?.posts?.data!![position]
+        val index = Random.nextInt(postsList?.photos?.data!!.size - 1);
+        val photo = postsList?.photos?.data!![index]
 
         holder.bind(post, photo)
     }
@@ -36,9 +46,9 @@ class PostsListAdapter(private val postsList: PostsAndPhotos): RecyclerView.Adap
     class PostViewHolder(inflater: LayoutInflater, parent: ViewGroup):
         RecyclerView.ViewHolder(inflater.inflate(R.layout.post_item, parent, false)) {
 
-        private var image: ImageView? = null
-        private var title: TextView? = null
-        private var body: TextView? = null
+        private val image: ImageView
+        private val title: TextView
+        private val body: TextView
 
         init {
             image = itemView.findViewById<ImageView>(R.id.image)
@@ -47,9 +57,14 @@ class PostsListAdapter(private val postsList: PostsAndPhotos): RecyclerView.Adap
         }
 
         fun bind(post: Post, photo: Photo) {
-            title?.text = post.title
-            body?.text = post.body
+            title.text = post.title
+            body.text = post.body
+            // Couldn't load photo thumbnailUrl so Justin had to do.
+            Glide.with(itemView)
+                .load("https://assets.entrepreneur.com/content/3x2/2000/learn-beiber-twitter.jpg")
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(image)
         }
-
     }
 }
