@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Posts</string>
-    <string name="title_activity_detail">PostDetailActivity</string>
+    <string name="title_activity_detail">PostDetail</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

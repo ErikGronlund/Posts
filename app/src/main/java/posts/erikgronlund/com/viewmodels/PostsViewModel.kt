@@ -33,17 +33,23 @@ class PostsViewModel(private val postsRepository: PostsRepository) : ViewModel()
         // println("### Init is called!!")
 
         // getPostsWithPhotos()
-        // getPhotos2()
-        // getPosts2()
+        getPhotos2()
+        getPosts2()
+
         postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
     }
 
     fun getPostsWithPhotos(): MutableLiveData<PostsAndPhotos> {
         // println("#### getPostsWithPhotos")
-        getPosts2()
-        getPhotos2()
+        // getPosts2()
+        // getPhotos2()
 
         return postsAndPhotos;
+    }
+
+    fun refreshPostsWithPhotos() {
+        getPosts2()
+        getPhotos2()
     }
 
     private fun getPosts() = liveData<Resource<List<Post>>>{

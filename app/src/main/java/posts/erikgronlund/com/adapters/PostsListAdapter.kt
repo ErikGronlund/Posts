@@ -1,19 +1,25 @@
 package posts.erikgronlund.com.adapters
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import posts.erikgronlund.com.DetailActivity
 import posts.erikgronlund.com.R
 import posts.erikgronlund.com.data.Photo
 import posts.erikgronlund.com.data.Post
 import posts.erikgronlund.com.data.PostsAndPhotos
 import kotlin.random.Random
 
-class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>() {
+
+class PostsListAdapter(context: Context): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>() {
+    private val context = context;
     private var postsList: PostsAndPhotos? = null
 
     fun setPostsAndPhotos(posts: PostsAndPhotos) {
@@ -40,12 +46,13 @@ class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>(
         val index = Random.nextInt(postsList?.photos?.data!!.size - 1);
         val photo = postsList?.photos?.data!![index]
 
-        holder.bind(post, photo)
+        holder.bind(context, post, photo)
     }
 
     class PostViewHolder(inflater: LayoutInflater, parent: ViewGroup):
         RecyclerView.ViewHolder(inflater.inflate(R.layout.post_item, parent, false)) {
 
+        private val parent = parent
         private val image: ImageView
         private val title: TextView
         private val body: TextView
@@ -56,7 +63,7 @@ class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>(
             body = itemView.findViewById<TextView>(R.id.body)
         }
 
-        fun bind(post: Post, photo: Photo) {
+        fun bind(context: Context, post: Post, photo: Photo) {
             title.text = post.title
             body.text = post.body
             // Couldn't load photo thumbnailUrl so Justin had to do.
@@ -65,6 +72,10 @@ class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>(
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(image)
+            body.setOnClickListener { v ->
+                val intent = DetailActivity.newIntent(context, post);
+                context.startActivity(intent)
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ class PostsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
         recyclerView = findViewById(R.id.recycler_view);
-        adapter = PostsListAdapter()
+        adapter = PostsListAdapter(this)
         recyclerView.adapter = adapter
         progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.visibility = View.GONE
