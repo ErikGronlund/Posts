@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewStub
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -26,6 +27,7 @@ class DetailActivity : AppCompatActivity() {
     private var comment1: CardView? = null
     private var comment2: CardView? = null
     private var comment3: CardView? = null
+    private var errorView: View? = null
 
     companion object {
         const val EXTRA_POST_ID = "id"
@@ -117,7 +119,20 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun handleError() {
+
         progressBar.visibility = View.GONE
+
+        if (errorView === null) {
+            val stub = findViewById<ViewStub>(R.id.stub_error)
+            errorView = stub.inflate()
+        }
+
+        errorView?.visibility = View.VISIBLE
+        errorView?.findViewById<Button>(R.id.try_again)?.setOnClickListener {
+            val model: PostsViewModel by viewModels()
+
+            // TODO how to refresh comments?
+        }
     }
 
     private fun getCommentView(index: Int): CardView? {

@@ -40,7 +40,6 @@ class PostsActivity : AppCompatActivity() {
 
         model.getPostsWithPhotos().observe(this, Observer {
             it?.let {
-                println("### Got new data " + it)
                 val photoStatus = it.photos.status
                 val postsStatus = it.posts.status
 
@@ -83,7 +82,6 @@ class PostsActivity : AppCompatActivity() {
             val model: PostsViewModel by viewModels()
             model.refreshPostsWithPhotos()
         }
-
     }
 
 }

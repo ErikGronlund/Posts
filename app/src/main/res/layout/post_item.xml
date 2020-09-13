@@ -27,8 +27,9 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             android:textStyle="bold"
+            android:textSize="18dp"
             tools:text="Title" />
 
         <TextView
@@ -36,6 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="3"
+            android:textSize="12dp"
             tools:text="Body" />
     </LinearLayout>
 </LinearLayout>

@@ -31,12 +31,12 @@ class PostsViewModel @ViewModelInject constructor(
     fun getComments(id: String): MutableLiveData<Resource<List<Comment>>> {
         val liveData = MutableLiveData<Resource<List<Comment>>>(Resource.loading());
 
-        try {
-            viewModelScope.launch {
-                liveData.value = Resource.success(data = postsRepository.getComments(id))
+        viewModelScope.launch {
+            try {
+                liveData.postValue(Resource.success(data = postsRepository.getComments(id)))
+            } catch (exception: Exception) {
+                liveData.postValue(Resource.error(exception))
             }
-        } catch (exception: Exception) {
-            liveData.value = Resource.error(exception)
         }
 
         return liveData;
@@ -59,7 +59,6 @@ class PostsViewModel @ViewModelInject constructor(
                 curr?.posts = Resource.success(data = postsRepository.getPosts())
                 postsAndPhotos.postValue(curr)
             } catch (exception: Exception) {
-                println("#### Error fetching posts!!")
                 val curr = postsAndPhotos.value
                 curr?.posts = Resource.error(exception)
                 postsAndPhotos.postValue(curr)
