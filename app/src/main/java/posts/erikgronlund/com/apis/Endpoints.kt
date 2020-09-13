@@ -14,6 +14,5 @@ interface Endpoints {
     suspend fun getPhotos(): List<Photo>
 
     @GET("/posts/{id}/comments")
-    suspend fun getComments(@Path("id") id: String): List<Comment>
-
+    suspend fun getComments(@Path(value="id") id: String): List<Comment>
 }

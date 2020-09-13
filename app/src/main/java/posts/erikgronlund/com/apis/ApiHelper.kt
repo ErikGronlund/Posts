@@ -5,5 +5,5 @@ class ApiHelper(private val endpoints: Endpoints) {
 
     suspend fun getPhotos() = endpoints.getPhotos();
 
-    suspend fun getComments() = endpoints.getComments();
+    suspend fun getComments(id: String) = endpoints.getComments(id);
 }

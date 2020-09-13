@@ -1,10 +1,5 @@
 package posts.erikgronlund.com.data
 
-/**
- * A generic class that holds a value with its loading status.
- *
- * @see <a href="https://github.com/android/architecture-components-samples/blob/master/GithubBrowserSample/app/src/main/java/com/android/example/github/vo/Resource.kt">Sample apps for Android Architecture Components</a>
- */
 data class Resource<out T>(val status: Status, val data: T?, val exception: Throwable?) {
     enum class Status {
         LOADING,

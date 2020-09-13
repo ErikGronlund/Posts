@@ -1,119 +1,88 @@
 package posts.erikgronlund.com.viewmodels
 
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import posts.erikgronlund.com.data.Photo
-import posts.erikgronlund.com.data.Post
+import posts.erikgronlund.com.data.Comment
 import posts.erikgronlund.com.data.PostsAndPhotos
 import posts.erikgronlund.com.data.Resource
 import posts.erikgronlund.com.repositories.PostsRepository
-import kotlin.coroutines.coroutineContext
 
-class PostsViewModel(private val postsRepository: PostsRepository) : ViewModel() {
-    private val posts: MutableLiveData<Resource<List<Post>>> = MutableLiveData<Resource<List<Post>>>()
+class PostsViewModel @ViewModelInject constructor(
+    private val postsRepository: PostsRepository,
+    @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val photos: MutableLiveData<Resource<List<Photo>>> = MutableLiveData<Resource<List<Photo>>>()
     private val postsAndPhotos: MutableLiveData<PostsAndPhotos> = MutableLiveData<PostsAndPhotos>()
-    // val postAndPhotos: MediatorLiveData<PostsAndPhotos> = MediatorLiveData<PostsAndPhotos>()
+    private val comments: MutableLiveData<HashMap<String, Resource<List<Comment>>>> = MutableLiveData<HashMap<String, Resource<List<Comment>>>>()
 
     init {
-       /* postAndPhotos.addSource(posts) { result: Resource<List<Post>>? ->
-            result?.let {
-                postAndPhotos.value?.posts = it
-            }
-        }
-
-        postAndPhotos.addSource(photos) { result: Resource<List<Photo>>? ->
-            result?.let {
-                postAndPhotos.value?.photos = it
-            }
-        };*/
-
-        // println("### Init is called!!")
-
-        // getPostsWithPhotos()
-        getPhotos2()
-        getPosts2()
+        getPhotos()
+        getPosts()
 
         postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
+        comments.value = HashMap();
     }
 
     fun getPostsWithPhotos(): MutableLiveData<PostsAndPhotos> {
-        // println("#### getPostsWithPhotos")
-        // getPosts2()
-        // getPhotos2()
-
         return postsAndPhotos;
     }
 
-    fun refreshPostsWithPhotos() {
-        getPosts2()
-        getPhotos2()
-    }
+    fun getComments(id: String): MutableLiveData<Resource<List<Comment>>> {
+        val liveData = MutableLiveData<Resource<List<Comment>>>(Resource.loading());
 
-    private fun getPosts() = liveData<Resource<List<Post>>>{
-        emit(Resource.loading())
         try {
-            emit(Resource.success(data = postsRepository.getPosts()))
+            viewModelScope.launch {
+                liveData.value = Resource.success(data = postsRepository.getComments(id))
+            }
         } catch (exception: Exception) {
-            emit(Resource.error(exception))
+            liveData.value = Resource.error(exception)
         }
+
+        return liveData;
     }
 
-    private fun getPosts2() {
-        // println("#### Loading posts")
+    fun refreshPostsWithPhotos() {
+        getPosts()
+        getPhotos()
+    }
+
+    private fun getPosts() {
         val curr = postsAndPhotos.value
         if (curr == null)
             postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
         curr?.posts = Resource.loading()
-        try {
-            viewModelScope.launch {
+
+        viewModelScope.launch {
+            try {
                 val curr = postsAndPhotos.value
-                println("### Fetching posts from repository")
                 curr?.posts = Resource.success(data = postsRepository.getPosts())
-                println("### DONE Fetching posts from repository")
-                postsAndPhotos.value = curr
-                //println("### New data: ")
-                //println(posts?.value?.data)
+                postsAndPhotos.postValue(curr)
+            } catch (exception: Exception) {
+                println("#### Error fetching posts!!")
+                val curr = postsAndPhotos.value
+                curr?.posts = Resource.error(exception)
+                postsAndPhotos.postValue(curr)
             }
-        } catch (exception: Exception) {
-            val curr = postsAndPhotos.value 
-            curr?.posts = Resource.error(exception)
-            postsAndPhotos.value = curr
         }
     }
 
-    private fun getPhotos() = liveData<Resource<List<Photo>>>{
-        emit(Resource.loading())
-        try {
-            emit(Resource.success(data = postsRepository.getPhotos()))
-        } catch (exception: Exception) {
-            emit(Resource.error(exception))
-        }
-    }
-
-    private fun getPhotos2() {
+    private fun getPhotos() {
         val curr = postsAndPhotos.value
         if (curr == null)
             postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
         curr?.photos = Resource.loading();
-        //photos.postValue(Resource.loading())
-        // println("#### Loading photos")
-        try {
-            val curr = postsAndPhotos.value
-            curr?.photos = Resource.loading();
-            viewModelScope.launch {
-                println("### Fetching photos from repository")
+
+        viewModelScope.launch {
+            try {
+                val curr = postsAndPhotos.value
                 curr?.photos = Resource.success(data = postsRepository.getPhotos())
-                println("### DONE Fetching photos from repository")
-                postsAndPhotos.postValue(curr) // photos.postValue(Resource.success(data = postsRepository.getPhotos()))
+                postsAndPhotos.postValue(curr)
+            } catch (exception: Exception) {
+                val curr = postsAndPhotos.value
+                curr?.photos = Resource.error(exception)
+                postsAndPhotos.postValue(curr)
             }
-        } catch (exception: Exception) {
-            val curr = postsAndPhotos.value
-            curr?.photos = Resource.error(exception)
-            postsAndPhotos.value = curr
         }
     }
-
 }

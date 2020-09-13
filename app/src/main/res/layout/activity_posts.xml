@@ -42,4 +42,11 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:layout_gravity="center"/>
+
+    <ViewStub
+        android:id="@+id/stub_error"
+        android:inflatedId="@+id/network_error"
+        android:layout="@layout/error"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
