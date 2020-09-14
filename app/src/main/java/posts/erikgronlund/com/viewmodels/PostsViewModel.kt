@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import posts.erikgronlund.com.data.Comment
 import posts.erikgronlund.com.data.PostsAndPhotos
 import posts.erikgronlund.com.data.Resource
+import posts.erikgronlund.com.livedata.RefreshableLiveData
 import posts.erikgronlund.com.repositories.PostsRepository
 
 class PostsViewModel @ViewModelInject constructor(
@@ -14,21 +15,28 @@ class PostsViewModel @ViewModelInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val postsAndPhotos: MutableLiveData<PostsAndPhotos> = MutableLiveData<PostsAndPhotos>()
-    private val comments: MutableLiveData<HashMap<String, Resource<List<Comment>>>> = MutableLiveData<HashMap<String, Resource<List<Comment>>>>()
 
     init {
         getPhotos()
         getPosts()
 
         postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
-        comments.value = HashMap();
     }
 
     fun getPostsWithPhotos(): MutableLiveData<PostsAndPhotos> {
         return postsAndPhotos;
     }
 
-    fun getComments(id: String): MutableLiveData<Resource<List<Comment>>> {
+    fun refreshPostsWithPhotos() {
+        getPosts()
+        getPhotos()
+    }
+
+    fun getComments(id: String): RefreshableLiveData<Resource<List<Comment>>> {
+        return RefreshableLiveData(source = {loadComments(id)})
+    }
+
+    private fun loadComments(id: String): LiveData<Resource<List<Comment>>> {
         val liveData = MutableLiveData<Resource<List<Comment>>>(Resource.loading());
 
         viewModelScope.launch {
@@ -40,11 +48,6 @@ class PostsViewModel @ViewModelInject constructor(
         }
 
         return liveData;
-    }
-
-    fun refreshPostsWithPhotos() {
-        getPosts()
-        getPhotos()
     }
 
     private fun getPosts() {

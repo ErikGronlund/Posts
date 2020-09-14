@@ -38,23 +38,25 @@ class PostsActivity : AppCompatActivity() {
 
         val model: PostsViewModel by viewModels()
 
-        model.getPostsWithPhotos().observe(this, Observer {
-            it?.let {
-                val photoStatus = it.photos.status
-                val postsStatus = it.posts.status
+        model.getPostsWithPhotos().observe(this, this::handlePostsChange)
+    }
 
-                if (photoStatus == Resource.Status.ERROR || postsStatus == Resource.Status.ERROR) {
-                    handleError();
-                } else if (photoStatus == Resource.Status.LOADING || postsStatus == Resource.Status.LOADING) {
-                    handleLoading();
-                } else if (photoStatus == Resource.Status.SUCCESS && postsStatus == Resource.Status.SUCCESS) {
-                    handleSuccess(it);
-                } else {
-                    // WTF
-                    handleError();
-                }
+    private fun handlePostsChange(posts: PostsAndPhotos) {
+        posts?.let {
+            val photoStatus = it.photos.status
+            val postsStatus = it.posts.status
+
+            if (photoStatus == Resource.Status.ERROR || postsStatus == Resource.Status.ERROR) {
+                handleError();
+            } else if (photoStatus == Resource.Status.LOADING || postsStatus == Resource.Status.LOADING) {
+                handleLoading();
+            } else if (photoStatus == Resource.Status.SUCCESS && postsStatus == Resource.Status.SUCCESS) {
+                handleSuccess(it);
+            } else {
+                // WTF
+                handleError();
             }
-        })
+        }
     }
 
     private fun handleLoading() {

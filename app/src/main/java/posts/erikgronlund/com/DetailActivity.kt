@@ -18,16 +18,18 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.detail_card.view.*
 import posts.erikgronlund.com.data.*
+import posts.erikgronlund.com.livedata.RefreshableLiveData
 import posts.erikgronlund.com.viewmodels.PostsViewModel
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
-    private lateinit var progressBar: View
     private var comment1: CardView? = null
     private var comment2: CardView? = null
     private var comment3: CardView? = null
     private var errorView: View? = null
+    private lateinit var progressBar: View
+    private lateinit var commentsLiveData: RefreshableLiveData<Resource<List<Comment>>>
 
     companion object {
         const val EXTRA_POST_ID = "id"
@@ -71,31 +73,28 @@ class DetailActivity : AppCompatActivity() {
 
         val model: PostsViewModel by viewModels()
 
-        val idString = id.toString()
-        model.getComments(idString).observe(this, {
-           it?.let {
-               val status = it.status
+        commentsLiveData = model.getComments(id.toString())
+        commentsLiveData.observe(this, this::handleCommentsChange)
+    }
 
-               if (status == Resource.Status.LOADING) {
-                   handleLoading();
-               } else if (status == Resource.Status.ERROR) {
-                   handleError();
-               } else if (status == Resource.Status.SUCCESS) {
-                   handleSuccess(it.data);
-               } else {
-                   // WTF
-                   handleError();
-               }
-           }
-        })
+    private fun handleCommentsChange(comments: Resource<List<Comment>>) {
+        comments?.let {
+            when(it.status) {
+                Resource.Status.LOADING -> handleLoading()
+                Resource.Status.ERROR -> handleError()
+                Resource.Status.SUCCESS -> handleSuccess(it.data)
+            }
+        }
     }
 
     private fun handleLoading() {
         progressBar.visibility = View.VISIBLE
+        errorView?.visibility = View.GONE
     }
 
     private fun handleSuccess(comments: List<Comment>?) {
         progressBar.visibility = View.GONE
+        errorView?.visibility = View.GONE
 
         if (comments === null)
             return
@@ -119,7 +118,6 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun handleError() {
-
         progressBar.visibility = View.GONE
 
         if (errorView === null) {
@@ -129,14 +127,11 @@ class DetailActivity : AppCompatActivity() {
 
         errorView?.visibility = View.VISIBLE
         errorView?.findViewById<Button>(R.id.try_again)?.setOnClickListener {
-            val model: PostsViewModel by viewModels()
-
-            // TODO how to refresh comments?
+            commentsLiveData.refresh()
         }
     }
 
     private fun getCommentView(index: Int): CardView? {
-        var result: CardView? = null
         when(index) {
             0 -> {
                 if (comment1 === null) {
@@ -144,7 +139,7 @@ class DetailActivity : AppCompatActivity() {
                   comment1 = stub.inflate() as CardView;
                 }
 
-                result = comment1
+                return comment1
             }
             1 -> {
                if (comment2 === null) {
@@ -152,7 +147,7 @@ class DetailActivity : AppCompatActivity() {
                    comment2 = stub.inflate() as CardView
                }
 
-               result = comment2
+               return comment2
             }
             2 -> {
                 if (comment3 === null) {
@@ -160,11 +155,11 @@ class DetailActivity : AppCompatActivity() {
                     comment3 = stub.inflate() as CardView
                 }
 
-                result = comment3
+                return comment3
             }
         }
 
-        return result
+        return null
     }
 
     private fun showComment(view: CardView, comment: Comment) {
