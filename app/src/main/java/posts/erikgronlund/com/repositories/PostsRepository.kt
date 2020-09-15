@@ -2,7 +2,7 @@ package posts.erikgronlund.com.repositories
 
 import posts.erikgronlund.com.apis.ApiHelper
 import posts.erikgronlund.com.apis.Endpoints
-import posts.erikgronlund.com.data.ServiceBuilder
+import posts.erikgronlund.com.apis.ServiceBuilder
 import javax.inject.Inject
 
 class PostsRepository @Inject constructor() {

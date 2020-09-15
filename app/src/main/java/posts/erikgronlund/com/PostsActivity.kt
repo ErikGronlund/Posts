@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +25,14 @@ class PostsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        initViews()
+
+        val model: PostsViewModel by viewModels()
+        model.getPostsWithPhotos().observe(this, this::handlePostsChange)
+    }
+
+    private fun initViews() {
         setContentView(R.layout.activity_posts)
         setSupportActionBar(findViewById(R.id.toolbar))
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
@@ -35,10 +42,6 @@ class PostsActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.visibility = View.GONE
-
-        val model: PostsViewModel by viewModels()
-
-        model.getPostsWithPhotos().observe(this, this::handlePostsChange)
     }
 
     private fun handlePostsChange(posts: PostsAndPhotos) {
@@ -85,5 +88,4 @@ class PostsActivity : AppCompatActivity() {
             model.refreshPostsWithPhotos()
         }
     }
-
 }

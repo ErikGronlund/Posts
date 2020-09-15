@@ -1,4 +1,4 @@
-package posts.erikgronlund.com.data
+package posts.erikgronlund.com.apis
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

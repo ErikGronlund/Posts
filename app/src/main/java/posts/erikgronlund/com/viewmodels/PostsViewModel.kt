@@ -14,13 +14,11 @@ class PostsViewModel @ViewModelInject constructor(
     private val postsRepository: PostsRepository,
     @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val postsAndPhotos: MutableLiveData<PostsAndPhotos> = MutableLiveData<PostsAndPhotos>()
+    private val postsAndPhotos: MutableLiveData<PostsAndPhotos> = MutableLiveData<PostsAndPhotos>(PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading()))
 
     init {
         getPhotos()
         getPosts()
-
-        postsAndPhotos.value = PostsAndPhotos(posts = Resource.loading(), photos = Resource.loading())
     }
 
     fun getPostsWithPhotos(): MutableLiveData<PostsAndPhotos> {

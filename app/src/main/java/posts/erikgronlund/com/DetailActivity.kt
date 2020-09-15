@@ -51,14 +51,22 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        initViews()
+        setDataFromIntent()
+        loadComments()
+    }
+
+    private fun initViews() {
         setContentView(R.layout.activity_detail)
         setSupportActionBar(findViewById(R.id.toolbar))
         progressBar = findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.visibility = View.GONE
+    }
 
+    private fun setDataFromIntent() {
         val title = intent.getStringExtra(EXTRA_POST_TITLE)
         val body = intent.getStringExtra(EXTRA_POST_BODY)
-        val id = intent.getIntExtra(EXTRA_POST_ID, -1)
         val photoUrl = intent.getStringExtra(EXTRA_POST_PHOTO_URL)
 
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title?.capitalize()
@@ -70,9 +78,12 @@ class DetailActivity : AppCompatActivity() {
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(backdrop)
+    }
 
+    private fun loadComments() {
         val model: PostsViewModel by viewModels()
 
+        val id = intent.getIntExtra(EXTRA_POST_ID, -1)
         commentsLiveData = model.getComments(id.toString())
         commentsLiveData.observe(this, this::handleCommentsChange)
     }
