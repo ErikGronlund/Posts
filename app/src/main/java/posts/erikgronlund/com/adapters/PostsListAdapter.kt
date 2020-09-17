@@ -52,10 +52,9 @@ class PostsListAdapter(): RecyclerView.Adapter<PostsListAdapter.PostViewHolder>(
             Glide.with(itemView)
                 .load(thumbnailUrl)
                 .centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(itemView.image)
 
-            itemView.body.setOnClickListener { v ->
+            itemView.setOnClickListener { v ->
                 val context = v.context
                 val intent = DetailActivity.newIntent(context, post, detailPhotoUrl);
                 context.startActivity(intent)

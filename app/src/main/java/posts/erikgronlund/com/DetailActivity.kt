@@ -76,7 +76,6 @@ class DetailActivity : AppCompatActivity() {
         Glide.with(this)
             .load(photoUrl)
             .centerCrop()
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(backdrop)
     }
 
